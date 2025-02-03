@@ -1,8 +1,14 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Feb  3 23:11:20 2025
+#%% IMPORT
+import pandas as pd
+from business import proceeding_EDA, NumberDataExploration, CharDataExploration
+pd.set_option('display.max_columns', None)
 
-@author: dungnguyen
-"""
+df = pd.read_csv('train.csv')
+# df.head()
+# df.info()
+# df.describe()
 
+#%% EDA
+proceeding_EDA(NumberDataExploration, df, 'Compartments')
+
+proceeding_EDA(CharDataExploration, df, 'Brand')
