@@ -6,17 +6,20 @@ import seaborn as sns
 #%% BASE EDA CLASS
 class DataExploration:
     def __init__(self, dataframe, col_name):
-        self.__col_name = col_name
+        self._col_name = col_name
         self.data = dataframe[col_name]
-        self.__data_length = len(self.data)
+        self._data_length = len(self.data)
     
     # Check null variable
     def check_cleaning_status(self):
         null_count = self.data.isnull().sum()
-        filling_percentage = (self.__data_length - null_count) / self.__data_length
+        filling_percentage = (self._data_length - null_count) / self._data_length
         
-        return f"\n'{self.__col_name}': {self.__data_length} observation,\
- {filling_percentage * 100:.2f}% available."
+        return {
+            "column": self._col_name,
+            "total_observation": self._data_length,
+            "filling_percentage": filling_percentage
+            }
  
     # For char data 
     def analyze_char_stat(self):
@@ -28,7 +31,8 @@ class DataExploration:
             labels=self.data.value_counts().index,
             autopct = '%1.1f%%'
             )
-        plt.title(f'Distribution of {self.__col_name}')
+        plt.title(f'Distribution of {self._col_name}')
+        plt.show()
 
     # For number data
     def analyze_number_stat(self):
@@ -41,7 +45,8 @@ class DataExploration:
     def plot_histogram(self):
         fig, ax = plt.subplots(figsize=(8, 6), dpi=200)
         sns.histplot(self.data)
-        plt.title(f'Distribution of {self.__col_name}')
+        plt.title(f'Distribution of {self._col_name}')
+        plt.show()
         
 #%% EDA SPECIALIZED FOR NUMBER TYPE ANALYSIS  
 class NumberDataExploration(DataExploration):
@@ -49,13 +54,13 @@ class NumberDataExploration(DataExploration):
         super().__init__(dataframe, col_name)
         
     def check_cleaning_status(self):
-        parent_print = super().check_cleaning_status()
-        current_print = parent_print + " Data type of number."
-        print(current_print)
-    
+        status = super().check_cleaning_status()
+        status['data_type'] = "Number"
+        return status
+
     def analyze_statistics(self):
         statement = super().analyze_number_stat()
-        print(statement)
+        return statement
     
     def plot_statistics(self):
         super().plot_histogram()
@@ -67,13 +72,13 @@ class CharDataExploration(DataExploration):
         super().__init__(dataframe, col_name)
         
     def check_cleaning_status(self):
-        parent_print = super().check_cleaning_status()
-        current_print = parent_print + " Data type of character."
-        print(current_print)
-    
+        status = super().check_cleaning_status()
+        status['data_type'] = "Character"
+        return status
+
     def analyze_statistics(self):
         result = super().analyze_char_stat()
-        print(result)
+        return result
     
     def plot_statistics(self):
         super().plot_pie_chart()
@@ -82,6 +87,12 @@ class CharDataExploration(DataExploration):
 #%% PLUG IN FUNCTION
 def proceeding_EDA(DE_process, dataframe, col_name):
     de = DE_process(dataframe, col_name)
-    de.check_cleaning_status()
-    de.analyze_statistics()
-    de.plot_statistics()
+    if hasattr(de, "check_cleaning_status"):
+        print(de.check_cleaning_status())
+        
+    if hasattr(de, "analyze_statistics"):
+        print(de.analyze_statistics())
+        
+    if hasattr(de, "plot_statistics"):
+        de.plot_statistics()
+    
