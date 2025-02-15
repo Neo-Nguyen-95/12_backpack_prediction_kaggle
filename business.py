@@ -1,4 +1,4 @@
-# import pandas as pd
+import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 # import numpy as np
@@ -6,9 +6,33 @@ import seaborn as sns
 #%% BASE EDA CLASS
 class DataExploration:
     def __init__(self, dataframe, col_name):
+        self._df = dataframe
         self._col_name = col_name
         self.data = dataframe[col_name]
         self._data_length = len(self.data)
+        
+    # Validate input dataframe
+    @property
+    def df(self):
+        return self._df
+    
+    @df.setter
+    def df(self, input_dataframe):
+        if not isinstance(input_dataframe, pd.DataFrame):
+            raise ValueError("The input dataframe must be a pandas dataframe")
+        self._df = input_dataframe
+        
+    # Validate input col_name
+    @property
+    def col_name(self):
+        return self._col_name
+    
+    @col_name.setter
+    def col_name(self, input_col_name):
+        if not isinstance(input_col_name, str):
+            raise ValueError("The input column must be a string")
+        self._col_name = input_col_name
+        
     
     # Check null variable
     def check_cleaning_status(self):
@@ -48,6 +72,12 @@ class DataExploration:
         plt.title(f'Distribution of {self._col_name}')
         plt.show()
         
+    def plot_box(self):
+        fig, ax = plt.subplots(figsize=(8, 6), dpi=200)
+        sns.boxplot(self.data)
+        plt.title(f'Distribution of {self._col_name}')
+        plt.show()
+        
 #%% EDA SPECIALIZED FOR NUMBER TYPE ANALYSIS  
 class NumberDataExploration(DataExploration):
     def __init__(self, dataframe, col_name):
@@ -64,6 +94,7 @@ class NumberDataExploration(DataExploration):
     
     def plot_statistics(self):
         super().plot_histogram()
+        super().plot_box()
         plt.show()
 
 #%% EDA SPECIALIZED FOR CHAR TYPE ANALYSIS
